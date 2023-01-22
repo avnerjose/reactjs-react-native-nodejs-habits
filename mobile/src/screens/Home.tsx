@@ -1,16 +1,42 @@
-import { ScrollView, Text, View } from "react-native";
+import { Alert, ScrollView, Text, View } from "react-native";
 import { Header } from "../components/Header";
 import { DAY_SIZE, HabitDay } from "../components/HabitDay";
 import { generateDatesFromYearBeginning } from "../utils/generate-dates-from-year-beginning";
 import { useNavigation } from "@react-navigation/native";
+import { useEffect, useState } from "react";
+import { api } from "../lib/axios";
+import { Loading } from "../components/Loading";
+import dayjs from "dayjs";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 const datesFromYearBeginning = generateDatesFromYearBeginning();
 const minimumDatesAmount = 9 * 7;
 const amountOfDatesToFill = minimumDatesAmount - datesFromYearBeginning.length;
 
+type Summary = Array<{
+  id: string;
+  date: string;
+  amount: number;
+  completed: number;
+}>;
+
 export function Home() {
   const { navigate } = useNavigation();
+  const [loading, setLoading] = useState(true);
+  const [summary, setSummary] = useState<Summary>([]);
+
+  const fetchHabitsSummary = async () => {
+    try {
+      setLoading(true);
+      const { data } = await api.get("/summary");
+      setSummary(data);
+    } catch (e) {
+      Alert.alert("Ops", "It wasn't possible to load the habits summary");
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const weekDaysRow = weekDays.map((day, i) => (
     <Text
@@ -22,16 +48,25 @@ export function Home() {
     </Text>
   ));
 
-  const habitDays = datesFromYearBeginning.map((date) => (
-    <HabitDay
-      key={date.toISOString()}
-      onPress={() =>
-        navigate("habit", {
-          date: date.toISOString(),
-        })
-      }
-    />
-  ));
+  const habitDays = datesFromYearBeginning.map((date) => {
+    const dayWithHabits = summary.find((day) =>
+      dayjs(date).isSame(day.date, "day")
+    );
+
+    return (
+      <HabitDay
+        key={date.toISOString()}
+        date={date}
+        amount={dayWithHabits?.amount}
+        completed={dayWithHabits?.completed}
+        onPress={() =>
+          navigate("habit", {
+            date: date.toISOString(),
+          })
+        }
+      />
+    );
+  });
 
   const datesToFill =
     amountOfDatesToFill > 0 &&
@@ -44,6 +79,14 @@ export function Home() {
         style={{ width: DAY_SIZE, height: DAY_SIZE }}
       />
     ));
+
+  useEffect(() => {
+    fetchHabitsSummary();
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
 
   return (
     <View className="flex-1 bg-background px-8 pt-16">

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import {
+  Alert,
   ScrollView,
   Text,
   TextInput,
@@ -11,6 +12,7 @@ import { Feather } from "@expo/vector-icons";
 import { BackButton } from "../components/BackButton";
 import { Checkbox } from "../components/Checkbox";
 import colors from "tailwindcss/colors";
+import axios from "axios";
 
 const weekDays = [
   "Sunday",
@@ -24,6 +26,30 @@ const weekDays = [
 
 export function NewHabit() {
   const [selectedWeekDays, setSelectedWeekDays] = useState<number[]>([]);
+  const [title, setTitle] = useState("");
+
+  const handleCreateNewHabit = async () => {
+    try {
+      if (!title.trim() || selectedWeekDays.length === 0) {
+        Alert.alert(
+          "New habit",
+          "Inform the habit title and select at least one day"
+        );
+        return;
+      }
+
+      await axios.post("/habits", {
+        title,
+        weekDays: selectedWeekDays,
+      });
+    } catch (e) {
+      console.log(e);
+      Alert.alert("Ops!", "It wasn't possible to create a new habit");
+    } finally {
+      setTitle("");
+      setSelectedWeekDays([]);
+    }
+  };
 
   const handleSelectWeekDay = (weekDayIndex: number) => {
     if (selectedWeekDays.includes(weekDayIndex)) {
@@ -68,6 +94,8 @@ export function NewHabit() {
           className="h-12 pl-4 rounded-lg mt-3 bg-zinc-900 text-white border-2 border-zinc-800 focus:border-green-600"
           placeholder="Exercises, sleeping well, etc..."
           placeholderTextColor={colors.zinc[400]}
+          value={title}
+          onChangeText={setTitle}
         />
 
         <Text className="font-semibold mt-4 mb-3 text-white text-base">
@@ -77,6 +105,7 @@ export function NewHabit() {
         <TouchableOpacity
           className="w-full h-14 flex-row items-center justify-center bg-green-600 rounded-md mt-6"
           activeOpacity={0.7}
+          onPress={handleCreateNewHabit}
         >
           <Feather name="check" size={20} color={colors.white} />
           <Text className="font-semibold text-base text-white ml-2">
