@@ -5,7 +5,8 @@ const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 
 const datesFromYearBeginning = generateDatesFromYearBeginning();
 const minimumSummaryDatesSize = 18 * 7;
-const amountOfDaysToFill = minimumSummaryDatesSize - datesFromYearBeginning.length;
+const amountOfDaysToFill =
+  minimumSummaryDatesSize - datesFromYearBeginning.length;
 
 export function SummaryTable() {
   const weekDaysColumn = weekDays.map((day, i) => (
@@ -17,8 +18,10 @@ export function SummaryTable() {
     </div>
   ));
 
-  const habitDays = datesFromYearBeginning.map((_) => <HabitDay />);
-  
+  const habitDays = datesFromYearBeginning.map((_) => (
+    <HabitDay amount={3} completed={2} />
+  ));
+
   const daysToFill =
     amountOfDaysToFill > 0 &&
     Array.from({ length: amountOfDaysToFill }).map((_, i) => (
