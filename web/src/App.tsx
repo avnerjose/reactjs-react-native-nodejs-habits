@@ -12,3 +12,7 @@ export function App() {
     </div>
   );
 }
+
+//Authenticação
+//Notificações Push / Service workers
+//Perfil público com gráfico de resumo

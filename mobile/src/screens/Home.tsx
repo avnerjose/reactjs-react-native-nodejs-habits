@@ -1,12 +1,13 @@
+import { useCallback, useState } from "react";
 import { Alert, ScrollView, Text, View } from "react-native";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
+import dayjs from "dayjs";
+
 import { Header } from "../components/Header";
 import { DAY_SIZE, HabitDay } from "../components/HabitDay";
-import { generateDatesFromYearBeginning } from "../utils/generate-dates-from-year-beginning";
-import { useNavigation } from "@react-navigation/native";
-import { useEffect, useState } from "react";
-import { api } from "../lib/axios";
 import { Loading } from "../components/Loading";
-import dayjs from "dayjs";
+import { generateDatesFromYearBeginning } from "../utils/generate-dates-from-year-beginning";
+import { api } from "../lib/axios";
 
 const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
 const datesFromYearBeginning = generateDatesFromYearBeginning();
@@ -80,9 +81,11 @@ export function Home() {
       />
     ));
 
-  useEffect(() => {
-    fetchHabitsSummary();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      fetchHabitsSummary();
+    }, [])
+  );
 
   if (loading) {
     return <Loading />;

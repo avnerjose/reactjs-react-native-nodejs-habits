@@ -21,9 +21,16 @@ type Summary = Array<{
 export function SummaryTable() {
   const [summary, setSummary] = useState<Summary>([]);
 
-  useEffect(() => {
-    api.get("/summary").then((res) => setSummary(res.data));
-  }, []);
+  const handleFetchSummary = async () => {
+    try {
+      const { data } = await api.get("/summary");
+
+      setSummary(data);
+    } catch (e) {
+      console.log(e);
+      alert("It wasn't possible to fetch summary");
+    }
+  };
 
   const weekDaysColumn = weekDays.map((day, i) => (
     <div
@@ -34,18 +41,21 @@ export function SummaryTable() {
     </div>
   ));
 
-  const habitDays = datesFromYearBeginning.map((date) => {
-    const dayInSummary = summary.find((day) =>
-      dayjs(date).isSame(day.date, "day")
-    );
-    return (
-      <HabitDay
-        date={date}
-        amount={dayInSummary?.amount}
-        completed={dayInSummary?.completed}
-      />
-    );
-  });
+  const habitDays =
+    summary.length > 0 &&
+    datesFromYearBeginning.map((date) => {
+      const dayInSummary = summary.find((day) =>
+        dayjs(date).isSame(day.date, "day")
+      );
+      return (
+        <HabitDay
+          key={date.toISOString()}
+          date={date}
+          amount={dayInSummary?.amount}
+          defaultCompleted={dayInSummary?.completed}
+        />
+      );
+    });
 
   const daysToFill =
     amountOfDaysToFill > 0 &&
@@ -55,6 +65,10 @@ export function SummaryTable() {
         className="w-10 h-10 bg-zinc-900 border-2 border-zinc-800 rounded-lg opacity-40 cursor-not-allowed"
       ></div>
     ));
+
+  useEffect(() => {
+    handleFetchSummary();
+  }, []);
 
   return (
     <div className="w-full flex">
