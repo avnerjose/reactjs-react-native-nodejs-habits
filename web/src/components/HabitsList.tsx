@@ -56,6 +56,7 @@ export function HabitsList({ date, onCompletedChanged }: HabitsListProps) {
         completedHabits,
         possibleHabits: habitsInfo!.possibleHabits,
       });
+      console.log("Entrou");
       onCompletedChanged(completedHabits.length);
     } catch (e) {
       console.log(e);
