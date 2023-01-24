@@ -23,7 +23,7 @@ export function Header() {
             <Dialog.Close className="absolute right-6 top-6 text-zinc-400 hover:text-zinc-200  rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 focus:ring-offset-zinc-900">
               <X size={24} aria-label="Fechar" />
             </Dialog.Close>
-            <Dialog.Title className="text-3xl leading-tight font-extrabold">Conteúdo Modal</Dialog.Title>
+            <Dialog.Title className="text-3xl leading-tight font-extrabold">Create new habit</Dialog.Title>
             <NewHabitForm/>
           </Dialog.Content>
         </Dialog.Portal>
